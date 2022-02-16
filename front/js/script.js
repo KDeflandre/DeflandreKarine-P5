@@ -20,9 +20,6 @@
 // displayProducts ();
 
 
-// code de Cyril 
-
-
   async function allProducts() {
     try {
       const response = await axios.get('http://localhost:3000/api/products/');
@@ -63,4 +60,4 @@
     const newElt = document.createElement("article");
     let elt = document.getElementById("items");
     elt.appendChild(newElt);
-    testtes
+    
