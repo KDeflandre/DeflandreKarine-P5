@@ -1,63 +1,59 @@
 
-// //Récupération des produits 
+ allProducts (); 
 
-// var allProducts = [];
+ NewProducts ();
 
-// const getProducts = async () => {
-//     await fetch('http://localhost:3000/api/products/')
-//     .then ((res) => res.json())
-//     .then ((promiseProduct) => {
-//         allProducts = promiseProduct; 
-//     }); 
-// };
-
-// // Affichage des produits 
-
-// const displayProducts = async () => {
-//     await getProducts();
-// };
-
-// displayProducts ();
-
-
-  async function allProducts() {
-    try {
-      const response = await axios.get('http://localhost:3000/api/products/');
-      return response
-    } 
-    catch (error) {
-      console.error(error);
-      return []
-    }
+  // Test V2 recup produits
+  async function allProducts () {
+  try {
+    let responseProducts = await fetch('http://localhost:3000/api/products/');
+      console.log("Products are ok =)")
+      return responseProducts.json();
   }
+  catch (error) {
+    console.error(error);
+    return []
+      }
+    }
+// Création et ajout des produits dans le DOM 
 
-// () => function allProducts() {
+  async function NewProducts () {
+    let result = await allProducts ()
+    .then( (responseProducts) => {
+      for (let i=0; i < responseProducts.length; i++) {		
 
-// }
-    allProducts ()
-    var allProducts = []
-   
-    allProducts = [
-        {id: 28, imageUrl: "/toto.png", name: "toto", price: 29.99},     
-        {id: 42, imageUrl: "/tata.png", name: "tata", price: 59.99},
-        {id: 42, imageUrl: "/tata.png", name: "tata", price: 59.99}
-      ]
-  
-    allProducts.forEach(product => {
-        let productId = product.id;
-        let productImg = product.imageUrl;
-        let productImgAlt = product.imageAlt;
-        let productName = product.name;
-        let productDescription = product.desription;
-        var productContainer = document.getElementById("items");
-      
-        productContainer.insertAdjacentHTML('beforeEnd',
-        "<img src=${productImg}>",
-        "<h3>${productName}</h3>",
-        "<p>${productDescription}</p>");
-    })
-   
-    const newElt = document.createElement("article");
-    let elt = document.getElementById("items");
-    elt.appendChild(newElt);
+       // ajout a 
+        let productLink = document.createElement("a");
+        document.querySelector(".items").appendChild(productLink);
+        productLink.href = `product.htlm?id=${responseProducts[i]._id}`;
+
+        // ajout article
+        let productArticle = document.createElement("article");
+        productLink.appendChild(productArticle);
+
+        // ajout image du produit
+        let productImg = document.createElement("img");
+        productArticle.appendChild(productImg);
+        productImg.src = responseProducts[i].imageUrl;
+        productImg.alt = responseProducts[i].imageUrl;
+
+        // ajout du titre du produit avec H3 
+        let productName = document.createElement("h3");
+        productArticle.appendChild(productName);
+        productName.classList.add("productName");
+        productName.innerHTML = responseProducts[i].name;
+
+        // ajout de la description avec p 
+        let productDescription = document.createElement("p");
+        productArticle.appendChild(productDescription);
+        productDescription.classList.add("productDescription");
+        productDescription.innerHTML = responseProducts[i].description;
+
+    }
+});
+console.log("Product are integrated");
+}
     
+
+
+
