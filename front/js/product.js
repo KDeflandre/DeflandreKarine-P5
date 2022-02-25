@@ -80,4 +80,27 @@ loadProduct ();
 //   }
 // }
 
+// ajout produits au panier
+function addToCart() {
+  const btnAddToCart = document.querySelector("#addToCart");
+  btnAddToCart.addEventListener("click", addToCart);
+  
+  // Vérif que la couleur et les quantités ont bien été choisis
+  const quantitySelect = document.querySelector("#quantity");
+  const colorSelect = document. querySelector("#colors");
+  
+  if (quantitySelect.value > 0 && quantitySelect.value <=100 && quantitySelect.value 
+    != 0 && colorSelect.value != 0) { 
 
+  // local storage     
+  if (localStorage.getItem("product")) {
+    
+    let productLocalStorage = JSON.parse(localStorage.getItem("product"));
+    console.log(productLocalStorage);
+
+    let id = idProduct;
+    let color = document.querySelector("#colors").value;
+    let quantity = document.querySelector("#quantity").value;
+
+}}
+}
