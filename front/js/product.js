@@ -4,7 +4,7 @@ const idProduct = params.get("id");
 console.log(idProduct);
 
 
-loadProduct ();
+loadProduct();
   async function loadProduct() {
   await fetch("http://localhost:3000/api/products/" + idProduct)
   .then((responseProduct) => responseProduct.json())
