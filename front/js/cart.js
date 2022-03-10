@@ -1,22 +1,22 @@
 // Local storage
 const cart = JSON.parse(localStorage.getItem("cart"));
 const allProduct = document.getElementById("cart__items")
-console.table(cart);
-
+var priceTable = {}
 
 // Récup des produits avec l'API et insertion de ceux-ci dans la page
-if (cart === null || cart == 0 ) {
-   allProduct.innerHTML = "<h1>--- Votre panier est vide ---</h1>"; 
-   allProduct.style["color"] = "yellow" ;
-  
-  } else {
-for (let idProduct in cart) {
-fetch("http://localhost:3000/api/products/" + idProduct)
-  .then((responseProduct) => responseProduct.json())
-  .then(product => {
-      for (let color in cart[idProduct]) {
+function udpateCart() {
+if (cart === null || cart == 0) {
+  allProduct.innerHTML = "<h1>--- Votre panier est vide ---</h1>";
+  allProduct.style["color"] = "yellow";
+} else {
+  let i = 0;
+  for (let idProduct in cart) {
+    fetch("http://localhost:3000/api/products/" + idProduct)
+      .then((responseProduct) => responseProduct.json())
+      .then(product => {
+        for (let color in cart[idProduct]) {
           allProduct.insertAdjacentHTML('beforeend',
-            `<article class="cart__item" data-id="${idProduct}" data-color="${product-color}">
+            `<article class="cart__item" data-id="${idProduct}" data-color="${product - color}">
                 <div class="cart__item__img">
                 <img src="${product.imageUrl}" 
                 alt="${product.altTxt}">
@@ -38,35 +38,89 @@ fetch("http://localhost:3000/api/products/" + idProduct)
                   </div>
                 </div>
               </article>`);
-}
-});
+        }
+        priceTable[idProduct] = product.price
+        cartTotal()
+      });
+  }
 }
 }
 
 // Récup du total des quantités 
 function cartTotal() {
+  let totalArticles = 0
+  let totalPrice = 0
 
-var itemQtt = document.getElementsByClassName("itemQuantity");
-var length = itemQtt.length,
-resultQuantity = 0;
+  for (let idProduct in cart) {
+    for (let color in cart[idProduct]) {
+      totalArticles += cart[idProduct][color]
 
-for (var i = 0; i < length; ++i) {
-  resultQuantity += itemQtt[i].valueAsNumber;
+      if (priceTable[idProduct]) {
+        totalPrice += priceTable[idProduct] * cart[idProduct][color]
+      }
+    }
+  }
+
+  let finalQuantity = document.getElementById("totalQuantity");
+  finalQuantity.innerHTML = totalArticles;
+
+  let finalPrice = document.getElementById("totalPrice")
+  finalPrice.innerHTML = totalPrice;
 }
 
-let finalQuantity = document.getElementById("totalQuantity");
-finalQuantity.innerHTML = resultQuantity;
-console.log(resultQuantity);
+udpateCart()
 
-// Récup prix total 
-resultPrice = 0;
 
-for (var i = 0; i <length; ++i) {
-  resultPrice += (Qtt[i].valueAsNumber * cart[i].productPrice);
+function deleteArticle() {
+  const btnDelete = document.querySelectorAll(".deleteItem");
+  console.log(btnDelete);
+  
+  for (let i = 0; i < btnDelete.length; i++){
+    btnDelete[i].addEventListener("click", (event) => {
+      event.preventDefault();
+      console.log(event);
+  
+      let idDelete = cart[i].idProduct;
+      let colorDelete = cart[i].colors;
+    
+      // filter 
+      cart = cart.filter(el => el.idProduct !== idDelete || el.colors !== colorDelete);
+      console.log(cart);
+      localStorage.setItem("cart", JSON.stringify(cart));
+
+
+      // alert produit supp + refresh
+      alert("Le produit a été supprimé du panier");
+      udpateCart()
+    })
+  }
 }
 
-let finalPrice = document.getElementById("totalPrice")
-finalPrice.innerHTML = resultPrice;
+deleteArticle()
 
+// Modification d'une quantité de produit
+function changeQtt() {
+
+  let articleQuantity = document.querySelectorAll(".itemQuantity");
+  let articleQuantityValue = cart[idProduct][color];
+
+  for (let i = 0; i < articleQuantity.length; i++){
+    articleQuantity[i].addEventListener("change", (event) => {
+          event.preventDefault();
+          console.log(event);
+
+          let articleQuantityChange = cart[i].articleQuantityValue;
+          let articleQuantityValue = articleQuantity[i].valueAsNumber;
+          
+          const resultFind = cart.find((el) => el.qttModifValue !== articleQuantityChange);
+
+          resultFind.articleQuantityValue = articleQuantityValue;
+          cart[i].articleQuantityValue = resultFind.cart[idProduct][color];
+
+          localStorage.setItem("cart", JSON.stringify(cart));
+      
+          udpateCart();
+      })
+  }
 }
-cartTotal();
+changeQtt();
