@@ -5,18 +5,19 @@ var priceTable = {}
 
 // Récup des produits avec l'API et insertion de ceux-ci dans la page
 function udpateCart() {
-if (cart === null || cart == 0) {
-  allProduct.innerHTML = "<h1>--- Votre panier est vide ---</h1>";
-  allProduct.style["color"] = "yellow";
-} else {
-  let i = 0;
-  for (let idProduct in cart) {
-    fetch("http://localhost:3000/api/products/" + idProduct)
-      .then((responseProduct) => responseProduct.json())
-      .then(product => {
-        for (let color in cart[idProduct]) {
-          allProduct.insertAdjacentHTML('beforeend',
-            `<article class="cart__item" data-id="${idProduct}" data-color="${product - color}">
+  allProduct.innerHTML = "";
+  if (cart === null || Object.keys(cart).length == 0) {
+    allProduct.innerHTML = "<h1>--- Votre panier est vide ---</h1>";
+    allProduct.style["color"] = "yellow";
+  } else {
+    let i = 0;
+    for (let idProduct in cart) {
+      fetch("http://localhost:3000/api/products/" + idProduct)
+        .then((responseProduct) => responseProduct.json())
+        .then(product => {
+          for (let color in cart[idProduct]) {
+            allProduct.insertAdjacentHTML('beforeend',
+              `<article class="cart__item" data-id="${idProduct}" data-color="${color}">
                 <div class="cart__item__img">
                 <img src="${product.imageUrl}" 
                 alt="${product.altTxt}">
@@ -30,20 +31,20 @@ if (cart === null || cart == 0) {
                   <div class="cart__item__content__settings">
                     <div class="cart__item__content__settings__quantity">
                       <p>Qté : </p>
-                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${cart[idProduct][color]}">
+                      <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${cart[idProduct][color]}" onchange="changeQty(this)">
                     </div>
                     <div class="cart__item__content__settings__delete">
-                      <p class="deleteItem">Supprimer</p>
+                      <p class="deleteItem" onclick="deleteItem(this)">Supprimer</p>
                     </div>
                   </div>
                 </div>
               </article>`);
-        }
-        priceTable[idProduct] = product.price
-        cartTotal()
-      });
+          }
+          priceTable[idProduct] = product.price
+          cartTotal()
+        });
+    }
   }
-}
 }
 
 // Récup du total des quantités 
@@ -68,59 +69,121 @@ function cartTotal() {
   finalPrice.innerHTML = totalPrice;
 }
 
-udpateCart()
+function deleteItem(target) {
+  let parent = target.closest("article");
 
+  let idDelete = parent.dataset.id;
+  let colorDelete = parent.dataset.color;
 
-function deleteArticle() {
-  const btnDelete = document.querySelectorAll(".deleteItem");
-  console.log(btnDelete);
-  
-  for (let i = 0; i < btnDelete.length; i++){
-    btnDelete[i].addEventListener("click", (event) => {
-      event.preventDefault();
-      console.log(event);
-  
-      let idDelete = cart[i].idProduct;
-      let colorDelete = cart[i].colors;
-    
-      // filter 
-      cart = cart.filter(el => el.idProduct !== idDelete || el.colors !== colorDelete);
-      console.log(cart);
-      localStorage.setItem("cart", JSON.stringify(cart));
-
-
-      // alert produit supp + refresh
-      alert("Le produit a été supprimé du panier");
-      udpateCart()
-    })
+  delete cart[idDelete][colorDelete]
+  if (Object.keys(cart[idDelete]).length == 0) {
+    delete cart[idDelete]
   }
-}
+  localStorage.setItem("cart", JSON.stringify(cart));
 
-deleteArticle()
+
+  // alert produit supp + refresh
+  alert("Le produit a été supprimé du panier");
+  udpateCart()
+}
 
 // Modification d'une quantité de produit
-function changeQtt() {
+function changeQty(target) {
+  let parent = target.closest("article");
 
-  let articleQuantity = document.querySelectorAll(".itemQuantity");
-  let articleQuantityValue = cart[idProduct][color];
+  let idProduct = parent.dataset.id;
+  let color = parent.dataset.color;
+  let newQty = parseInt(target.value);
 
-  for (let i = 0; i < articleQuantity.length; i++){
-    articleQuantity[i].addEventListener("change", (event) => {
-          event.preventDefault();
-          console.log(event);
+  cart[idProduct][color] = newQty
 
-          let articleQuantityChange = cart[i].articleQuantityValue;
-          let articleQuantityValue = articleQuantity[i].valueAsNumber;
-          
-          const resultFind = cart.find((el) => el.qttModifValue !== articleQuantityChange);
+  localStorage.setItem("cart", JSON.stringify(cart));
 
-          resultFind.articleQuantityValue = articleQuantityValue;
-          cart[i].articleQuantityValue = resultFind.cart[idProduct][color];
-
-          localStorage.setItem("cart", JSON.stringify(cart));
-      
-          udpateCart();
-      })
-  }
+  udpateCart()
 }
-changeQtt();
+udpateCart()
+
+//****************************** Formulaire **********************************************//
+
+function getForm () {
+  let form = document.querySelector(".cart_order_form");
+
+  // Expression regulières
+  let emailRegex = new RegExp('^[a-zA-Z0-9.-_]+[@]{1}[a-zA-Z0-9.-_]+[.]{1}[a-z]{2,10}$');
+  let infoRegex = new RegExp("^[a-zA-Z ,.'-]+$");
+  let addressRegex = new RegExp("^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç]+)+");
+
+  // Modif du formulaire 
+  form.firstName.addEventListener('change', function() {
+    validFirstName(this);
+});
+
+form.lastName.addEventListener('change', function() {
+    validLastName(this);
+});
+
+form.address.addEventListener('change', function() {
+    validAddress(this);
+});
+
+form.city.addEventListener('change', function() {
+    validCity(this);
+});
+
+form.email.addEventListener('change', function() {
+    validEmail(this);
+});
+
+//validation des éléments
+const validFirstName = function(inputFirstName) {
+  let firstNameErrorMsg = inputFirstName.nextElementSibling;
+
+  if (infoRegex.test(inputFirstName.value)) {
+      firstNameErrorMsg.innerHTML = '';
+      console.log(infoRegex);
+  } else {
+      firstNameErrorMsg.innerHTML = 'Veuillez renseigner votre prénom.';
+  }
+};
+
+const validLastName = function(inputLastName) {
+  let lastNameErrorMsg = inputLastName.nextElementSibling;
+
+  if (infoRegex.test(inputLastName.value)) {
+      lastNameErrorMsg.innerHTML = '';
+  } else {
+      lastNameErrorMsg.innerHTML = 'Veuillez renseigner votre nom.';
+  }
+};
+
+const validAddress = function(inputAddress) {
+  let addressErrorMsg = inputAddress.nextElementSibling;
+
+  if (addressRegex.test(inputAddress.value)) {
+      addressErrorMsg.innerHTML = '';
+  } else {
+      addressErrorMsg.innerHTML = 'Veuillez renseigner votre adresse.';
+  }
+};
+
+const validCity = function(inputCity) {
+  let cityErrorMsg = inputCity.nextElementSibling;
+
+  if (infoRegex.test(inputCity.value)) {
+      cityErrorMsg.innerHTML = '';
+  } else {
+      cityErrorMsg.innerHTML = 'Veuillez renseigner votre ville.';
+  }
+};
+
+const validEmail = function(inputEmail) {
+  let emailErrorMsg = inputEmail.nextElementSibling;
+
+  if (emailRegex.test(inputEmail.value)) {
+      emailErrorMsg.innerHTML = '';
+  } else {
+      emailErrorMsg.innerHTML = 'Veuillez renseigner votre email.';
+  }
+};
+}
+
