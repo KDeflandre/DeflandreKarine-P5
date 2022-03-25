@@ -190,50 +190,44 @@ getForm();
 // Envoi des infos au localstorage
 function postForm() {
   const btnOrder = document.getElementById("order");
-  btnOrder.addEventListener("click", (event)=> {
+  btnOrder.addEventListener("click", (event) => {
+  event.preventDefault();
+  console.log(event);
 
-  //Récup des infos du formulaire
-  let inputFirstName = document.getElementById('firstName');
-  let inputLastName = document.getElementById('lastName');
-  let inputAddress = document.getElementById('address');
-  let inputCity = document.getElementById('city');
-  let inputEmail = document.getElementById('email');
-  
   // Array local storage
   let products = [];
   for (let i = 0; i<cart.length;i++) {
       products.push(cart[i].idProduct);
   }
-
   console.log(products);
 
+  const contact = {
+  firstName : document.getElementById('firstName').value,
+  lastName : document.getElementById('lastName').value,
+  address : document.getElementById('address').value,
+  city : document.getElementById('city').value,
+  email : document.getElementById('email').value
+}
   const sendOrder = {
-      contact : {
-        firstName: inputFirstName.value,
-        lastName: inputLastName.value,
-        address: inputAddress.value,
-        city: inputCity.value,
-        email: inputEmail.value,
-      },
-      products,
-} 
-
-const options = {
+  contact,
+  products,
+}
+  const options = {
     method: "POST",
     body: JSON.stringify(sendOrder),
     headers: {
         "Content-Type": "application/json",
-    },
+    }
 };
-    
+  
 fetch("http://localhost:3000/api/products/order", options)
-        .then(response => response.json())
-        .then(data => {
-          console.log(data);
-          localStorage.setItem("orderId", data.orderId);
-          document.location.href = 'confirmation.html?id='+ data.orderId;
+  .then(response => response.json())
+  .then(data => {
+  localStorage.setItem('orderId', data.orderId);
+  document.location.href = 'confirmation.html?id='+ data.orderId;
+});
       });
 
-  });
-}
-postForm ();
+  };
+
+postForm();
