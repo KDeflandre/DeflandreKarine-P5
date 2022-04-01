@@ -1,9 +1,8 @@
 // Lien du produit vers la page produit + id produit 
 let params = (new URL(window.location.href)).searchParams;
 const idProduct = params.get("id");
-console.log(idProduct);
 
-
+// Récup de l'id du produit + chargement du produit avec ses caractéristiques
 loadProduct();
   async function loadProduct() {
   await fetch("http://localhost:3000/api/products/" + idProduct)
@@ -15,8 +14,8 @@ loadProduct();
   item.querySelector("#title").innerHTML = product.name;
   item.querySelector("#price").innerHTML = product.price;
   item.querySelector("#description").innerHTML = product.description;
-  console.log("Product are ok =)")
 
+  // Ajout des couleurs possibles 
   product.colors.forEach(color => {
     let productColors = document.createElement("option");
     document.querySelector("#colors").appendChild(productColors);
@@ -31,7 +30,7 @@ const btnAddToCart = document.querySelector("#addToCart");
 btnAddToCart.addEventListener("click", addToCart);
 
 function addToCart() {
-  // Vérif que la couleur et les quantités ont bien été choisis
+  // Vérif que la couleur et les quantités ont bien été choisies
   const quantitySelect = parseInt(document.querySelector("#quantity").value);
   const colorSelect = document.querySelector("#colors").value;
   
@@ -59,5 +58,8 @@ function addToCart() {
       }
     }
     localStorage.setItem("cart", JSON.stringify(cart))
+    
+    // alert produit ajouté
+      alert("Produit ajouté au panier");
   }
 }

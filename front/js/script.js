@@ -32,5 +32,4 @@ async function NewProducts() {
         </a>`);
       });
     });
-  console.log("Product are integrated");
 }

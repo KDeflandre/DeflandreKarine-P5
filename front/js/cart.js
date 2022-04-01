@@ -192,15 +192,7 @@ function postForm() {
   const btnOrder = document.getElementById("order");
   btnOrder.addEventListener("click", (event) => {
   event.preventDefault();
-  console.log(event);
-
-  // Array local storage
-  let products = [];
-  for (let i = 0; i<cart.length;i++) {
-      products.push(cart[i].idProduct);
-  }
-  console.log(products);
-
+  
   const contact = {
   firstName : document.getElementById('firstName').value,
   lastName : document.getElementById('lastName').value,
@@ -210,8 +202,9 @@ function postForm() {
 }
   const sendOrder = {
   contact,
-  products,
-}
+  products: Object.keys(cart)
+  }
+
   const options = {
     method: "POST",
     body: JSON.stringify(sendOrder),
@@ -223,8 +216,7 @@ function postForm() {
 fetch("http://localhost:3000/api/products/order", options)
   .then(response => response.json())
   .then(data => {
-  localStorage.setItem('orderId', data.orderId);
-  document.location.href = 'confirmation.html?id='+ data.orderId;
+    document.location.href = 'confirmation.html?orderId='+ data.orderId;
 });
       });
 
