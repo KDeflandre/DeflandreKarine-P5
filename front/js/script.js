@@ -1,9 +1,8 @@
 
- NewProducts();
+newProducts();
 
 // Recup produits
-
-  async function allProducts() {
+async function allProducts() {
   try {
     let responseProducts = await fetch('http://localhost:3000/api/products/');
       return responseProducts.json();
@@ -12,11 +11,10 @@
     console.error(error);
     return []
       }
-    }
+}
     
-  // Création des produits
-
-async function NewProducts() {
+// Création des produits
+async function newProducts() {
   await allProducts()
     .then((responseProducts) => {
       const productContainer = document.getElementById("items")
@@ -32,3 +30,4 @@ async function NewProducts() {
       });
     });
 }
+
