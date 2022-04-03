@@ -6,7 +6,6 @@
   async function allProducts() {
   try {
     let responseProducts = await fetch('http://localhost:3000/api/products/');
-      console.log("Products are ok =)")
       return responseProducts.json();
   }
   catch (error) {
