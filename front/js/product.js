@@ -25,7 +25,8 @@ loadProduct();
   })
 }
 
-// Mise au panier 
+//****************************** Mise au panier **********************************************//
+
 const btnAddToCart = document.querySelector("#addToCart");
 btnAddToCart.addEventListener("click", addToCart);
 
